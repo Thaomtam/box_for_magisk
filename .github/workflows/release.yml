@@ -16,6 +16,6 @@ jobs:
       - name: Upload release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.ref_name }}
+          tag_name: ${{ github.event.inputs.tag }}
           files: box_for_root-v*.zip
           generate_release_notes: true
