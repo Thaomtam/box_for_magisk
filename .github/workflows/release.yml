@@ -1,0 +1,45 @@
+name: release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.1.0
+      - name: Get Version
+        id: get_version
+        run: |
+          echo "date=$(date +%Y%m%d)" >> "$GITHUB_OUTPUT"
+
+      - name: Update update.json and module.prop
+        run: |
+          echo '{
+            "version": "${{ github.event.inputs.tag }}",
+            "versionCode": "${{ steps.get_version.outputs.date }}",
+            "zipUrl": "https://github.com/Thaomtam/box_for_magisk/releases/download/${{ github.event.inputs.tag }}/box_for_root-${{ github.event.inputs.tag }}.zip",
+            "changelog": "https://github.com/Thaomtam/box_for_magisk/raw/master/CHANGELOG.md"
+          }' > update.json
+
+          sed -i "s/$(grep -oP 'version=\K[^ ]+' module.prop)/${{ github.event.inputs.tag }}/g" module.prop
+          sed -i "s/$(grep -oP 'versionCode=\K[^ ]+' module.prop)/$(date +%Y%m%d)/g" module.prop
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add update.json module.prop
+          git commit -m "${{ github.event.inputs.tag }}"
+          git push -f origin "${{github.event.inputs.branch}}"
+ 
+      - name: run build.sh
+        run: |
+          sh build.sh
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event.inputs.tag }}
+          files: box_for_root-v*.zip
+          generate_release_notes: true

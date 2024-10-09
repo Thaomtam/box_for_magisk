@@ -1,0 +1,7 @@
+id=box_for_root
+name=Box for Magisk/KernelSU
+version=ProV1.7.1
+versionCode=20240910
+author=Thời-Tiết
+description=use sing-box, clash, v2ray, hysteria and xray for tunnel proxy on android device
+updateJson=https://github.com/Thaomtam/box_for_magisk/raw/master/update.json
